@@ -8,18 +8,22 @@
 //food should not generate on the snake or on the wall
 //snake speed should increase after eating fruit
 //TODO: make snake head such that it faces in the moving direction
+
+
 const foodImg = new Image()
 const wallImg = new Image()
 const snakeHeadUpImg = new Image()
 const snakeHeadDownImg = new Image()
 const snakeHeadRightImg = new Image()
 const snakeHeadLeftImg = new Image()
+
 foodImg.src = "img/food.png"
 wallImg.src = "img/brick.jpg"
 snakeHeadUpImg.src = "img/snake_head_up.png"
 snakeHeadDownImg.src = "img/snake_head_down.png"
 snakeHeadRightImg.src = "img/snake_head_right.png"
 snakeHeadLeftImg.src = "img/snake_head_left.png"
+
 
 let dead = new Audio()
 let eat = new Audio()
@@ -34,6 +38,10 @@ up.src = "audio/up.mp3"
 right.src = "audio/right.mp3"
 left.src = "audio/left.mp3"
 down.src = "audio/down.mp3"
+
+//preface
+//the whole canvas is supposed to be divided into cells like a chess board of size `cellSize`
+//so if the coordinates are cellX : 5 cellY: 3 it's actual coordinates will be x: 5 * cellSize and y : 3 * cellSize
 
 class Wall {
   constructor(ctx, boardWidth, boardHeight, cellSize) {
@@ -76,14 +84,16 @@ class Fruit {
   }
 
   generateFruitLocation(snake, wall) {
+    //the fruit should randomly generate within the board
     this.cellX = Math.round(Math.random() * (this.boardWidth * this.cellSize - this.cellSize) / this.cellSize)
     this.cellY = Math.round(Math.random() * (this.boardHeight * this.cellSize - this.cellSize) / this.cellSize)
+    //fruit must not generate inside snake. if inside run the function again
     snake.snake.forEach((egg) => {
       if (egg.cellX === this.cellX && egg.cellY === this.cellY) {
         this.generateFruitLocation(snake, wall)
       }
     })
-
+    //fruit must not generate inside the walls
     wall.wall.forEach((brick) => {
       if (brick.cellX === this.cellX && brick.cellY === this.cellY) {
         this.generateFruitLocation(snake, wall)
@@ -125,11 +135,11 @@ class Snake {
     let keyCode = e.keyCode
     if (keyCode >= 37 && keyCode <= 40 && keyCode !== this.keyBuffer[this.keyBuffer.length - 1]) {
       this.begin = 1
-      this.keyBuffer.push(keyCode);
+      this.keyBuffer.push(keyCode); //keyBuffer is used so that each direction change actually takes place. stops the snake from going reverse(changing direction twice within loopTime)
       //this.keybuffer = this.keyBuffer.concat(keyCode)
       console.log(this.keyBuffer)
     }
-    if (keyCode) e.preventDefault();
+    if (keyCode) e.preventDefault(); //page shouldn't scroll while playing
   }
 
   updateSnake(fruit, wall) {
@@ -137,6 +147,7 @@ class Snake {
     if (this.begin != 0) {
       //set direction
       var key = this.keyBuffer.shift();
+      //condition doesn't allow snake to go into itself
       if (this.direction != 'right' && key === 37) {
         this.setDirection('left')
         left.play()
@@ -150,7 +161,7 @@ class Snake {
         this.setDirection('down')
         down.play()
       }
-
+      //snake moves forward by popping tail, and pushing head in moving direction
       if (this.direction == "right") {
         this.snake.unshift({ cellX: this.headCellX + 1, cellY: this.headCellY })
       }
@@ -163,7 +174,7 @@ class Snake {
       else if (this.direction == "down") {
         this.snake.unshift({ cellX: this.headCellX, cellY: this.headCellY + 1 })
       }
-      //when snake eats food
+      //when snake eats food, new fruit will generate
       if (fruit.cellX == this.snake[0].cellX && fruit.cellY == this.snake[0].cellY) {
         fruit.generateFruitLocation(this, wall)
         eat.play()
@@ -191,11 +202,12 @@ class Snake {
   }
 
   paintSnake(margin) {
+    //draws the body of the snake
     this.snake.forEach((egg) => {
       //console.log(egg)
       const isSnakeHead = egg.cellX === this.headCellX && egg.cellY === this.headCellY
       if (!isSnakeHead) {
-        this.ctx.fillStyle = "#88fc03"
+        this.ctx.fillStyle = "#9ef739"
         this.ctx.fillRect(egg.cellX * this.cellSize + margin,
           egg.cellY * this.cellSize + margin,
           this.cellSize - 2 * margin,
@@ -212,15 +224,15 @@ class Snake {
     {
       X: this.headCellX * this.cellSize,
       Y: this.headCellY * this.cellSize,
-      width : this.cellSize,
-      height : this.cellSize 
+      width: this.cellSize,
+      height: this.cellSize
     }
 
     const args = [head.X,
-      head.Y,
-      head.height,
-      head.width]
-
+    head.Y,
+    head.height,
+    head.width]
+    //draw the head of the snake
     if (this.direction === "up") {
       this.ctx.drawImage(
         snakeHeadUpImg,
@@ -245,7 +257,7 @@ class Snake {
 }
 
 function paintCanvas(ctx, originX, originY, width, height) {
-  ctx.fillStyle = "black"
+  ctx.fillStyle = "ivory"
   ctx.fillRect(originX, originY, width, height)
 }
 
@@ -282,12 +294,12 @@ function draw(snake, fruit, wall, ctx, originX, originY, boardWidth, boardHeight
 }
 
 const main = () => {
-  var cellSize = 20,
+  var cellSize = 30,
     originX = 0,
     originY = 0,
     startCellX = 3,
     startCellY = 2,
-    loopTime = 1000, //
+    loopTime = 100, //
     snakeInitialSize = 3
   var canvas = document.getElementById("canvas"),
     ctx = canvas.getContext("2d"),
