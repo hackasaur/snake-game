@@ -201,8 +201,9 @@ class Snake {
     }
   }
 
-  paintSnake(margin) {
+  paintSnake(margin, stretch) {
     //draws the body of the snake
+    console.log(this.snake)
     this.snake.forEach((egg) => {
       //console.log(egg)
       const isSnakeHead = egg.cellX === this.headCellX && egg.cellY === this.headCellY
@@ -214,6 +215,7 @@ class Snake {
           this.cellSize - 2 * margin)
       }
     })
+
     //snake head
     // this.ctx.beginPath()
     // this.ctx.lineWidth = 4
@@ -228,30 +230,37 @@ class Snake {
       height: this.cellSize
     }
 
-    const args = [head.X,
-    head.Y,
-    head.height,
-    head.width]
-    //draw the head of the snake
     if (this.direction === "up") {
       this.ctx.drawImage(
         snakeHeadUpImg,
-        ...args)
+        head.X - stretch,
+        head.Y - stretch,
+        head.height + 2 * stretch,
+        head.width + 2 * stretch)
     }
     else if (this.direction === "down") {
       this.ctx.drawImage(
         snakeHeadDownImg,
-        ...args)
+        head.X - stretch,
+        head.Y - stretch,
+        head.height + 2 * stretch,
+        head.width + 2 * stretch)
     }
     else if (this.direction === "right") {
       this.ctx.drawImage(
         snakeHeadRightImg,
-        ...args)
+        head.X,
+        head.Y - stretch,
+        head.height + 2 * stretch,
+        head.width + 2 * stretch)
     }
     else if (this.direction === "left") {
       this.ctx.drawImage(
         snakeHeadLeftImg,
-        ...args)
+        head.X,
+        head.Y - stretch,
+        head.height + 2 * stretch,
+        head.width + 2 * stretch)
     }
   }
 }
@@ -278,6 +287,7 @@ function drawGrid(ctx, originX, originY, boardWidth, boardHeight, cellSize) {
   }
 }
 
+
 function draw(snake, fruit, wall, ctx, originX, originY, boardWidth, boardHeight, cellSize) {
   console.log("tick")
   snake.updateSnake(fruit, wall)
@@ -289,7 +299,7 @@ function draw(snake, fruit, wall, ctx, originX, originY, boardWidth, boardHeight
   paintCanvas(ctx, originX, originY, boardWidth * cellSize, boardHeight * cellSize)
   wall.paintWall(3)
   drawGrid(ctx, originX, originY, boardWidth, boardHeight, cellSize)
-  snake.paintSnake(3)
+  snake.paintSnake(3, 7)
   fruit.paintFruit()
 }
 
@@ -361,5 +371,3 @@ const PubSub = () => {
     }
   }
 }
-
-
