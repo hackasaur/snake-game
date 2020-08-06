@@ -1,7 +1,7 @@
 # snake-game(incomplete)
 snake game made in vanilla javaScript
 
-## notable features:
+## Notable features:
 * buffer for key presses
 * object oriented design
 * sound
